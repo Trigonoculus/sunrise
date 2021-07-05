@@ -19,5 +19,8 @@
     "randomcolor": "^0.6.2",
     "suncalc": "^1.8.0",
     "tz-lookup-oss": "^6.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.30.0"
   }
 }
