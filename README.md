@@ -18,18 +18,26 @@ Usage
 ---
 First, clone this repository:
 
-```git clone https://github.com/Trigonoculus/sunrise```
+```bash
+git clone https://github.com/Trigonoculus/sunrise
+```
 
 Second, install dependencies:
 
-```npm install```
+```bash
+npm install
+```
 
 Thirdly, copy `.env.example` to `.env`. For unix systems:
 
-```cp .env.example .env```
+```bash
+cp .env.example .env
+```
 
 Then, edit the file using your favorite text editor. Each value is self-explanatory.
 
 Lastly, run the bot:
 
-```node bot.js```
+```bash
+node bot.js
+```
