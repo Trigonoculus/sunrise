@@ -1,0 +1,23 @@
+{
+  "name": "sunrise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "comma-number": "^2.1.0",
+    "dayjs": "^1.10.5",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "geonames.js": "^3.0.3",
+    "pretty-ms": "^7.0.1",
+    "randomcolor": "^0.6.2",
+    "suncalc": "^1.8.0",
+    "tz-lookup-oss": "^6.2.1"
+  }
+}
