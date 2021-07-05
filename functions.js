@@ -14,13 +14,6 @@ module.exports = {
         const firstRes = search.geonames[0];
         return firstRes;
     },
-    geonamesTzQuery: async function(username, lat, long, radius) {
-        if (username === null) return console.log('Username required');
-        let rad;
-        if (radius) rad = '&radius=' + radius;
-        const response = await axios.post(`http://api.geonames.org/timezoneJSON?lat=${lat}&lng=${long}${rad}&username=${username}`);
-        return(response.data);
-    },
     getLightColor: function(hue) {
         if (!hue) return randomColor({ luminosity: 'light' });
         return randomColor({ luminosity: 'light', hue: hue });
