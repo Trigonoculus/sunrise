@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@airport-discovery/metars-tafs": "^1.0.3",
     "comma-number": "^2.1.0",
     "dayjs": "^1.10.5",
     "discord.js": "^12.5.3",
