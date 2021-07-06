@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { getLightColor, findAirport, convertinHg, parseRawMetarObsTime, getSeason } = require('../functions.js');
+const { findAirport, convertinHg, parseRawMetarObsTime, getSeason } = require('../functions.js');
 const airportDiscovery = require('@airport-discovery/metars-tafs');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -17,37 +17,44 @@ function formatSunString(date, tz) {
 
 module.exports = {
     name: 'metar',
-    aliases: ['m'],
+    aliases: ['m', 'wx'],
     description: 'Gets the latest METAR for an airport',
     run: async (message, args) => {
-        // Search METAR
-        if(!args[0]) return message.channel.send('An ICAO airport code is needed.');
+        // checks
+        if(!args[0]) return message.channel.send('An 3-letter airport code (IATA) or an ICAO code is needed.');
+        if(!(args[0].length === 3 | args[0].length === 4)) return message.channel.send('Invalid length. Only airport codes are accepted');
+        // start
         message.channel.startTyping();
-        const airport = args[0];
+        let airport = args[0].toUpperCase();
         console.log(airport);
-        let metar;
-        try {
-            metar = await airportDiscovery.metars(airport);
-        } catch(err) {
-            console.log(err);
-            message.channel.stopTyping();
-            return message.channel.send('An error has occurred while looking up the METAR.');
-        }
-        console.log(metar);
-        // Check undefined
-        if (typeof metar === 'undefined') {
-            message.channel.stopTyping();
-            return message.channel.send(`No data found. Either an incorrect airport was given (${airport}) or no METARs are available at this time.`);
-        }
         // Find airport
         let airportData;
         try {
             airportData = await findAirport(airport);
-            console.log(airportData);
         } catch(err) {
-            console.log(err);
+            console.error(err);
             message.channel.stopTyping();
             return message.channel.send(`An error occurred while finding airport data for ${airport}.`);
+        }
+        // Check undefined
+        if (typeof airportData === 'undefined' || airportData.tz === '\\N') {
+            message.channel.stopTyping();
+            return message.channel.send(`No data found. Looks like an incorrect airport was given (${airport}).`);
+        }
+        if (airport.length === 3) airport = airportData.icao;
+        // METAR query
+        let metar;
+        try {
+            metar = await airportDiscovery.metars(airport);
+        } catch(err) {
+            console.error(err);
+            message.channel.stopTyping();
+            return message.channel.send('An error has occurred while looking up the METAR.');
+        }
+        // Check undefined
+        if (typeof metar === 'undefined') {
+            message.channel.stopTyping();
+            return message.channel.send(`No data found. No METARs are available for ${airport} at this time.`);
         }
         // Wind formatting
         let windFormat;
@@ -67,7 +74,7 @@ module.exports = {
             sun = SunCalc.getTimes(new Date(), airportData.lat, airportData.long);
         } catch (err) {
             message.channel.stopTyping();
-            console.log(err);
+            console.error(err);
             return message.channel.send('An error has occurred.');
         }
         if(isNaN(sun.sunrise) || isNaN(sun.sunset)) {
@@ -83,7 +90,7 @@ module.exports = {
         const sunString = `${dawn} ↗️ ${sunrise} ☀️ ${sunset} ↘️ ${dusk}${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
         // Make embed
         const embed = new Discord.MessageEmbed()
-            .setTitle(`Weather information for ${airport}`)
+            .setTitle(`Weather information for ${!(airportData.iata === '\\N') ? airportData.iata + ' / ' : ''}${airportData.icao}`)
             .setFooter(`Observed ${obsTimeDifferenceMins.toFixed(0)} minutes ago`)
             .setTimestamp(obsTime)
             .setColor((obsTimeDifferenceMins <= 60) ? '#A7DB42' : '#FF7F7F')
