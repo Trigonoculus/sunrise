@@ -26,7 +26,6 @@ module.exports = {
         // start
         message.channel.startTyping();
         let airport = args[0].toUpperCase();
-        console.log(airport);
         // Find airport
         let airportData;
         try {
