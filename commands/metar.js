@@ -98,7 +98,7 @@ module.exports = {
         const sunString = `${dawn} ↗️ ${sunrise} ☀️ ${sunset} ↘️ ${dusk}${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
 
         // Temperature formatting
-        const tempString = `${metar.temperatureC}°C${metar.dewPointC ? ' ' + metar.dewpointC + '°C' : ''}`;
+        const tempString = `${metar.temperatureC}°C${!(typeof metar.dewPointC === 'undefined') ? ' / ' + metar.dewPointC + '°C' : ''}`;
 
         // Make embed
         const embed = new Discord.MessageEmbed()
