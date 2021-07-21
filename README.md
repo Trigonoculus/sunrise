@@ -19,7 +19,7 @@ Limitations
 ---
 GeoNames' free API has a limit of 1,000 requests per hour and 20,000 per day.
 
-Usage
+Installation
 ---
 First, clone this repository:
 
@@ -32,6 +32,8 @@ Second, install dependencies:
 ```bash
 npm install
 ```
+
+*If you get an error about node-gyp, see [here](https://github.com/nodejs/node-gyp).*
 
 Thirdly, copy `.env.example` to `.env`. For unix systems:
 
@@ -46,3 +48,9 @@ Lastly, run the bot:
 ```bash
 node bot.js
 ```
+
+Acknowledgements
+---
+This project uses OpenFlights Airport Database, which is available under the [Open Database License](https://opendatacommons.org/licenses/odbl/1-0/).
+
+> **This data is not suitable for navigation.** OpenFlights does not assume any responsibility whatsoever for its accuracy, and consequently assumes no liability whatsoever for results obtained or loss or damage incurred as a result of application of the data. OpenFlights expressly disclaims all warranties, expressed or implied, including but not limited to implied warranties of merchantability and fitness for any particular purpose.
