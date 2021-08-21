@@ -14,7 +14,7 @@ dayjs.extend(duration);
 module.exports = {
     name: 'sun',
     aliases: ['sunrise', 'sunset', 's'],
-    description: 'Gets the information for a place',
+    description: 'Gets the sun information for a place',
     run: async (message, args) => {
         let search, tzQuery, sun, polarStatus;
         try {
@@ -60,7 +60,6 @@ module.exports = {
         // Make embed
         const embed = new Discord.MessageEmbed()
             .setTitle(`Place Information for ${search.name}`)
-            // .setTimestamp()
             .setFooter('☔ It\'s Raining After All')
             .setColor(getLightColor('red'))
             .addFields(
