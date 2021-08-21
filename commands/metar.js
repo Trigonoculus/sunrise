@@ -23,6 +23,10 @@ module.exports = {
         // checks
         if(!args[0]) return message.channel.send('An 3-letter airport code (IATA) or an ICAO code is needed.');
         if(!(args[0].length === 3 | args[0].length === 4)) return message.channel.send('Invalid length. Only airport codes are accepted');
+        // parse arg 1, can be recursive with for loop later
+        let useUtc, useLocal;
+        if(args[1] === '-z' | args[1] === '--zulu' | args[1] === '-u' | args[1] === '--utc') useUtc = true;
+        if(args[1] === '-l' | args[1] === '--local') useLocal = true;
         // start
         message.channel.startTyping();
         let airport = args[0].toUpperCase();
@@ -77,17 +81,27 @@ module.exports = {
             console.error(err);
             return message.channel.send('An error has occurred.');
         }
-        if(isNaN(sun.sunrise) || isNaN(sun.sunset)) {
-            const season = getSeason(airportData.lat, new Date());
+        const season = getSeason(airportData.lat, new Date());
+        if (isNaN(sun.sunrise) || isNaN(sun.sunset)) {
             if (season === 'winter') polarStatus = 'down all day';
             if (season === 'summer') polarStatus = 'up all day';
         }
         // Sun string formatting
-        const dawn = formatSunString(sun.dawn, tz);
-        const sunrise = formatSunString(sun.sunrise, tz);
-        const sunset = formatSunString(sun.sunset, tz);
-        const dusk = formatSunString(sun.dusk, tz);
-        const sunString = `${dawn} ↗️ ${sunrise} ☀️ ${sunset} ↘️ ${dusk}${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
+        let sunString;
+        if (!useUtc) {
+            const dawn = formatSunString(sun.dawn, tz);
+            const sunrise = formatSunString(sun.sunrise, tz);
+            const sunset = formatSunString(sun.sunset, tz);
+            const dusk = formatSunString(sun.dusk, tz);
+            if (!useLocal) sunString = `${dawn} ↗️ ${sunrise} ☀️ ${sunset} ↘️ ${dusk}${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
+            else sunString = `<t:${(sun.dawn / 1000).toFixed(0)}:t> ↗️ <t:${(sun.sunrise / 1000).toFixed(0)}:t> ☀️ <t:${(sun.sunset / 1000).toFixed(0)}:t> ↘️ <t:${(sun.dusk / 1000).toFixed(0)}:t>${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
+        } else {
+            const dawnZ = formatSunString(sun.dawn, 'UTC');
+            const sunriseZ = formatSunString(sun.sunrise, 'UTC');
+            const sunsetZ = formatSunString(sun.sunset, 'UTC');
+            const duskZ = formatSunString(sun.dusk, 'UTC');
+            sunString = `${dawnZ} ↗️ ${sunriseZ} ☀️ ${sunsetZ} ↘️ ${duskZ}${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
+        }
         // Make embed
         const embed = new Discord.MessageEmbed()
             .setTitle(`Weather information for ${!(airportData.iata === '\\N') ? airportData.iata + ' / ' : ''}${airportData.icao}`)
@@ -96,7 +110,7 @@ module.exports = {
             .setColor((obsTimeDifferenceMins <= 60) ? '#A7DB42' : '#FF7F7F')
             .addFields(
                 { name: airportData.name, value: `${airportData.city}, ${airportData.country.toUpperCase()}`, inline: false },
-                { name: 'Airport information', value: sunString, inline: false },
+                { name: `Sun information (${useUtc ? 'UTC' : 'L'})`, value: sunString, inline: false },
                 { name: 'Local time', value: dayjs(new Date()).tz(airportData.tz).format('HH:mm Z'), inline: true },
                 { name: 'Elevation', value: `${airportData.altitude}ft`, inline: true },
                 { name: 'Coordinates', value: `${airportData.lat.toFixed(3)}, ${airportData.long.toFixed(3)}`, inline: true },
