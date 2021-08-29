@@ -16,6 +16,11 @@ function formatSunString(date, tz) {
     return string;
 }
 
+function formatAdaptive(date, type) {
+    const string = isNaN(date) ? '--:--' : `<t:${(date / 1000).toFixed(0)}:${type}>`;
+    return string;
+}
+
 module.exports = {
     name: 'sun-airport',
     aliases: ['sa', 's-a', 'sun-a', 'as'],
@@ -77,20 +82,20 @@ module.exports = {
         const sunrise = formatSunString(sun.sunrise, tz);
         const sunset = formatSunString(sun.sunset, tz);
         const dusk = formatSunString(sun.dusk, tz);
-        const sunStringLocal = `${dawn} ↗️ ${sunrise} ☀️ ${sunset} ↘️ ${dusk}${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
-        const sunStringAdapt = `<t:${(sun.dawn / 1000).toFixed(0)}:t> ↗️ <t:${(sun.sunrise / 1000).toFixed(0)}:t> ☀️ <t:${(sun.sunset / 1000).toFixed(0)}:t> ↘️ <t:${(sun.dusk / 1000).toFixed(0)}:t>${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
+        const sunStringLocal = `**Dawn** at ${dawn} LT\n**Sunrise** at ${sunrise} LT\n**Sunset** at ${sunset} LT\n**Dusk** at ${dusk} LT`;
+        const sunStringAdapt = `**Dawn** at ${formatAdaptive(sun.dawn, 't')}\n**Sunrise** at ${formatAdaptive(sun.sunrise, 't')}\n**Sunset** at ${formatAdaptive(sun.sunset, 't')}\n**Dusk** at ${formatAdaptive(sun.dusk, 't')}`;
 
         const dawnZ = formatSunString(sun.dawn, 'UTC');
         const sunriseZ = formatSunString(sun.sunrise, 'UTC');
         const sunsetZ = formatSunString(sun.sunset, 'UTC');
         const duskZ = formatSunString(sun.dusk, 'UTC');
-        const sunStringUtc = `${dawnZ} ↗️ ${sunriseZ} ☀️ ${sunsetZ} ↘️ ${duskZ}${(polarStatus) ? ' [' + polarStatus + ']' : ''}`;
+        const sunStringUtc = `**Dawn** at ${dawnZ} UTC\n**Sunrise** at ${sunriseZ} UTC\n**Sunset** at ${sunsetZ} UTC\n**Dusk** at ${duskZ} UTC`;
 
         // day length
         let dayLength;
         if (polarStatus) {
-            if (polarStatus === 'Up all day') dayLength = '24 hours';
-            if (polarStatus === 'Down all day') dayLength = 'None';
+            if (polarStatus === 'up all day') dayLength = 'Sun is up all day.';
+            if (polarStatus === 'down all day') dayLength = 'Sun is down all day.';
         } else {
             dayLength = prettyms(sun.sunset - sun.sunrise, { secondsDecimalDigits: 0 });
         }
@@ -102,12 +107,12 @@ module.exports = {
             .setColor('#A7DB42')
             .addFields(
                 { name: airportData.name, value: `${airportData.city}, ${airportData.country.toUpperCase()}`, inline: false },
-                { name: 'Local time', value: dayjs(new Date()).tz(airportData.tz).format('HH:mm Z'), inline: true },
+                { name: 'Current LT', value: dayjs(new Date()).tz(airportData.tz).format('HH:mm Z'), inline: true },
                 { name: 'UTC', value: dayjs(new Date()).tz('UTC').format('HH:mmz'), inline: true },
                 { name: 'Day length', value: dayLength, inline: true },
-                { name: 'Sun: Local', value: sunStringLocal, inline: false },
-                { name: 'Sun: UTC', value: sunStringUtc, inline: false },
-                { name: 'Sun: Adaptive', value: sunStringAdapt, inline: false },
+                { name: 'Local', value: sunStringLocal, inline: true },
+                { name: 'UTC', value: sunStringUtc, inline: true },
+                { name: 'Adaptive', value: sunStringAdapt, inline: true },
             );
         message.channel.send(embed);
         message.channel.stopTyping();
