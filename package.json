@@ -13,7 +13,7 @@
     "@airport-discovery/metars-tafs": "^1.0.3",
     "comma-number": "^2.1.0",
     "dayjs": "^1.10.5",
-    "discord.js": "^12.5.3",
+    "discord.js": "12.5.3",
     "dotenv": "^10.0.0",
     "geonames.js": "^3.0.3",
     "pretty-ms": "^7.0.1",
