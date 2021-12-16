@@ -72,6 +72,16 @@ module.exports = {
             windFormat = `${metar.wind.directionDegrees}° at ${metar.wind.speedKt} knots`;
         }
 
+        // TAF Query
+        let taf;
+        try {
+            taf = await airportDiscovery.tafs(airport);
+        } catch(err) {
+            console.error(err);
+            message.channel.stopTyping();
+            return message.channel.send('An error has occurred while looking up the TAF.');
+        }
+
         // Get observation time + difference
         const obsTime = parseRawMetarObsTime(metar.rawText);
         const obsTimeDifference = new Date() - obsTime;
@@ -116,7 +126,7 @@ module.exports = {
         // Make embed
         const embed = new Discord.MessageEmbed()
             .setTitle(`Weather information for ${!(airportData.iata === '\\N') ? airportData.iata + ' / ' : ''}${airportData.icao}`)
-            .setFooter(`Observed ${obsTimeDifferenceMins.toFixed(0)} minutes ago`)
+            .setFooter(`METAR observed ${obsTimeDifferenceMins.toFixed(0)} minutes ago`)
             .setTimestamp(obsTime)
             .setColor((obsTimeDifferenceMins <= 60) ? '#A7DB42' : '#FF7F7F')
             .addFields(
@@ -126,9 +136,10 @@ module.exports = {
                 { name: 'Elevation', value: `${airportData.altitude}ft`, inline: true },
                 { name: 'Coordinates', value: `${airportData.lat.toFixed(3)}, ${airportData.long.toFixed(3)}`, inline: true },
                 { name: 'Raw METAR', value: '`' + metar.rawText + '`', inline: false },
-                { name: 'Wind', value: `${windFormat}`, inline: true },
-                { name: 'Temperature / Dew', value: tempString, inline: true },
-                { name: 'Pressure', value: `${convertinHg(metar.altimInHg)} hPa`, inline: true },
+                // { name: 'Wind', value: `${windFormat}`, inline: true },
+                // { name: 'Temperature / Dew', value: tempString, inline: true },
+                // { name: 'Pressure', value: `${convertinHg(metar.altimInHg)} hPa`, inline: true },
+                { name: 'TAF', value: `\`${taf.rawText}\``, inline: false },
             );
         message.channel.send(embed);
         message.channel.stopTyping();
