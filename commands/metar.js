@@ -63,6 +63,10 @@ module.exports = {
             message.channel.stopTyping();
             return message.channel.send(`No data found. No METARs are available for ${airport} at this time.`);
         }
+        if (typeof metar.rawText === 'undefined') {
+            message.channel.stopTyping();
+            return message.channel.send(`An error has occurred while parsing the METAR. Response: ${metar}`);
+        }
 
         // Wind formatting
         let windFormat;
